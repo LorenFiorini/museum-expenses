@@ -1,9 +1,13 @@
 import { Link, Navigate, Route, Routes, useLocation } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import UploadPage from "./pages/UploadPage";
+import LoginPage from "./pages/LoginPage";
+import ProfilePage from "./pages/ProfilePage";
 import { useDataContext } from "./state/DataContext";
+import { useAuth } from "./state/AuthContext";
 
 function NavBar() {
+  const { user, logout } = useAuth();
   const location = useLocation();
 
   return (
@@ -16,7 +20,27 @@ function NavBar() {
         <Link className={location.pathname === "/dashboard" ? "active" : ""} to="/dashboard">
           Dashboard
         </Link>
+        <Link className={location.pathname === "/profile" ? "active" : ""} to="/profile">
+          Profile
+        </Link>
       </nav>
+      <div className="nav__user">
+        {user ? (
+          <>
+            <span className="nav__user-email">{user.email}</span>
+            <button className="btn secondary small" type="button" onClick={logout}>
+              Log out
+            </button>
+          </>
+        ) : (
+          <Link
+            className={location.pathname === "/login" ? "active" : ""}
+            to="/login"
+          >
+            Log in
+          </Link>
+        )}
+      </div>
     </header>
   );
 }
@@ -33,6 +57,21 @@ function EmptyState() {
   );
 }
 
+function RequireAuth({ children }: { children: JSX.Element }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
+
+  if (loading) {
+    return <div className="empty">Checking session...</div>;
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace state={{ from: location.pathname }} />;
+  }
+
+  return children;
+}
+
 export default function App() {
   const { dataReady } = useDataContext();
 
@@ -42,10 +81,23 @@ export default function App() {
       <main className="page">
         <Routes>
           <Route path="/" element={<EmptyState />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/upload" element={<UploadPage />} />
           <Route
             path="/dashboard"
-            element={dataReady ? <DashboardPage /> : <Navigate to="/upload" replace />}
+            element={
+              <RequireAuth>
+                {dataReady ? <DashboardPage /> : <Navigate to="/upload" replace />}
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <RequireAuth>
+                <ProfilePage />
+              </RequireAuth>
+            }
           />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
@@ -53,4 +105,5 @@ export default function App() {
     </div>
   );
 }
+
 

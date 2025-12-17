@@ -40,3 +40,4 @@ export default function SimpleAreaChart({ title, data, color = "#0ea5e9" }: Prop
   );
 }
 
+

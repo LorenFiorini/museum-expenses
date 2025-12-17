@@ -26,3 +26,4 @@ export default function BarBreakdown({ title, data, color = "#22c55e" }: Props) 
   );
 }
 
+

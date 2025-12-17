@@ -1,8 +1,8 @@
 import { useState } from "react";
 import FileDrop from "../components/FileDrop";
-import { parseWorkbook } from "../lib/parser";
 import { useDataContext } from "../state/DataContext";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../state/AuthContext";
 
 export default function UploadPage() {
   const [files, setFiles] = useState<File[]>([]);
@@ -11,22 +11,47 @@ export default function UploadPage() {
   const [busy, setBusy] = useState(false);
   const { setData, clearData } = useDataContext();
   const navigate = useNavigate();
+   const { token } = useAuth();
 
   const handleSubmit = async () => {
-    setBusy(true);
-    setError(null);
-    setWarnings([]);
-    const result = await parseWorkbook(files);
-    setBusy(false);
-
-    if (!result.ok) {
-      setError(result.error);
+    if (!token) {
+      navigate("/login", { replace: true, state: { from: "/upload" } });
       return;
     }
 
-    setWarnings(result.warnings);
-    setData(result.data);
-    navigate("/dashboard");
+    setBusy(true);
+    setError(null);
+    setWarnings([]);
+    try {
+      const form = new FormData();
+      files.forEach((file) => form.append("files", file));
+
+      const res = await fetch("http://localhost:4000/api/files/upload", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: form
+      });
+
+      const body = (await res.json().catch(() => ({}))) as {
+        message?: string;
+        payload?: { expenses: unknown[]; gifts: unknown[] };
+        warnings?: string[];
+      };
+
+      if (!res.ok || !body.payload) {
+        throw new Error(body.message || "Upload failed");
+      }
+
+      setWarnings(body.warnings || []);
+      setData(body.payload as any);
+      navigate("/dashboard");
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -81,4 +106,5 @@ export default function UploadPage() {
     </div>
   );
 }
+
 
