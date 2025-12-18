@@ -35,3 +35,13 @@ export type TrendPoint = { label: string; value: number };
 
 export type BreakdownSlice = { label: string; value: number };
 
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+export type AuthResponse = {
+  token: string;
+  user: User;
+};
