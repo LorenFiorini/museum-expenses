@@ -58,3 +58,6 @@ export default function FileDrop({ label, accept, onFiles }: Props) {
   );
 }
 
+
+
+

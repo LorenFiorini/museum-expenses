@@ -2,18 +2,23 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import cors from "cors";
-import dotenv from "dotenv";
-
-dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
+
+// Get JWT secret from environment variable
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key-change-in-production";
 
-app.use(cors());
+// Enable CORS for all routes
+app.use(cors({
+  origin: true, // Allow all origins in production
+  credentials: true
+}));
+
 app.use(express.json());
 
 // In-memory user storage (in production, use a database)
+// Note: This will reset on each serverless function cold start
+// For production, use a database like Vercel Postgres, MongoDB, etc.
 const users = [];
 
 // Middleware to verify JWT token
@@ -132,10 +137,6 @@ app.get("/api/auth/me", authenticateToken, (req, res) => {
   });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
-
-
-
+// Export the Express app as a serverless function
+export default app;
 

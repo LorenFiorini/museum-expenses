@@ -2,7 +2,9 @@ import { createContext, useContext, useState, useEffect, ReactNode } from "react
 import { User, AuthResponse } from "../types";
 import { loadFromStorage, persistToStorage } from "../utils/storage";
 
-const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:4000";
+// Use relative path in production (Vercel), absolute path in development
+const API_BASE = import.meta.env.VITE_API_BASE || 
+  (import.meta.env.PROD ? "" : "http://localhost:4000");
 
 interface AuthContextType {
   user: User | null;
