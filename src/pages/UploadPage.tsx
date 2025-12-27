@@ -1,6 +1,6 @@
 import { useState } from "react";
 import FileDrop from "../components/FileDrop";
-import { parseWorkbook } from "../lib/parser";
+import { parseWorkbook } from "@/lib/parser";
 import { useDataContext } from "../state/DataContext";
 import { useNavigate } from "react-router-dom";
 
