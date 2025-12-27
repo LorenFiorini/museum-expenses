@@ -2,7 +2,7 @@ import SummaryCard from "../components/SummaryCard";
 import SimpleAreaChart from "../components/SimpleAreaChart";
 import BarBreakdown from "../components/BarBreakdown";
 import DataTable from "../components/DataTable";
-import { computeExpenseMetrics, computeGiftMetrics } from "@/lib/metrics";
+import { computeExpenseMetrics, computeGiftMetrics } from "@/lib/metrics.ts";
 import { useDataContext } from "../state/DataContext";
 
 export default function DashboardPage() {
